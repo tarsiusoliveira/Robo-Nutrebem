@@ -2,15 +2,16 @@ from playwright.sync_api import sync_playwright
 import pandas as pd
 import time
 
-def limpar_restricoes_escola_all():
-    print("Carregando base de dados...")
-    df = pd.read_csv("dados_exec_prod.csv")
-    #produtos_unicos = df[df['school_id'] == 175]['product_id'].unique()
+def limpar_restricoes_staging():
+    print("Carregando base de dados de Staging...")
+    # 1. Atualizado o nome do arquivo CSV
+    df = pd.read_csv("dados_teste_staging.csv")
+    
+    # 2. Removido o filtro da escola 199. Agora ele pega os IDs únicos do arquivo inteiro!
     produtos_unicos = df['product_id'].unique()
-
+    
     total_tarefas = len(produtos_unicos)
-    #print(f"Total de produtos únicos para atualizar na Escola 175: {total_tarefas}")
-    print(f"Total de produtos únicos para atualizar em todas as escolas: {total_tarefas}")
+    print(f"Total de produtos únicos para atualizar no Staging: {total_tarefas}")
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
@@ -22,26 +23,27 @@ def limpar_restricoes_escola_all():
         # Aceita (clica em OK) em qualquer modal/alerta do navegador automaticamente
         page.on("dialog", lambda dialog: dialog.accept())
 
-        # 1. Fazer Login (URLs e inputs atualizados!)
-        print("Iniciando processo de Login...")
-        page.goto("https://app.nutrebem.com.br/pt-BR/login") 
+        # 3. Fazer Login (Nova URL de Staging)
+        print("Iniciando processo de Login no Staging...")
+        page.goto("https://nutrebem.dev.nutrebem.com.br/pt-BR/login") 
         
-        # O campo de e-mail agora usa type='text' conforme sua correção
+        # ATENÇÃO: Preencha com as credenciais válidas do ambiente de Staging
         page.fill("input[type='text']", "tarsius+admin@easyfood.com.br")
-        page.fill("input[type='password']", "92629262Ts")
+        page.fill("input[type='password']", "123")
         page.click("input[type='submit'], button:has-text('Entrar')") 
         
         page.wait_for_load_state('networkidle')
-        print("Login realizado com sucesso! Iniciando as correções...")
+        print("Login realizado com sucesso! Iniciando as correções em massa...")
 
         sucessos = 0
         erros = 0
         
-        # 2. Iterar sobre os produtos
+        # Iterar sobre todos os produtos mapeados
         for i, produto_id in enumerate(produtos_unicos):
             print(f"[{i + 1}/{total_tarefas}] Atualizando Produto {produto_id}...")
             
-            url_edicao = f"https://app.nutrebem.com.br/pt-BR/canteen_operator/product_restrictions/{produto_id}/edit"
+            # 4. Nova URL de edição de produtos (Staging)
+            url_edicao = f"https://nutrebem.dev.nutrebem.com.br/pt-BR/canteen_operator/product_restrictions/{produto_id}/edit"
             
             try:
                 page.goto(url_edicao)
@@ -62,11 +64,11 @@ def limpar_restricoes_escola_all():
             time.sleep(1)
 
         print("\n" + "="*40)
-        print("PROCESSO FINALIZADO!")
+        print("PROCESSO DE STAGING FINALIZADO!")
         print(f"Sucessos: {sucessos} | Erros: {erros}")
         print("="*40)
 
         browser.close()
 
 if __name__ == "__main__":
-    limpar_restricoes_escola_all()
+    limpar_restricoes_staging()
