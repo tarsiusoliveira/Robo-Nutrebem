@@ -4,15 +4,16 @@
 [![License](https://img.shields.io/badge/license-UNLICENSED-red)](./LICENSE)
 [![Security](https://img.shields.io/badge/security-hardened-brightgreen)](./SECURITY.md)
 
-**Automation using Python Playwright** - A robust browser automation tool for managing product restrictions in Nutrebem canteen systems across production and staging environments.
+**Automation using Python Playwright** - A comprehensive automation toolkit for managing product restrictions and promotional credits in Nutrebem canteen systems across production and staging environments.
 
 ## 📋 About
 
-This project automates the process of updating product restrictions in Nutrebem environments. It uses Playwright for browser automation to:
+This project provides a suite of automated robots for managing Nutrebem canteen operations. It uses Playwright for browser automation to:
 
-- Read product IDs from CSV data files
-- Navigate to the web application
-- Update product restriction settings in bulk
+- Read product IDs and student data from CSV files
+- Navigate to the web application automatically
+- Update product restrictions in bulk across environments
+- Launch promotional credits to students
 - Handle both production and staging environments
 - Provide detailed logging and error reporting
 
@@ -26,7 +27,7 @@ This project automates the process of updating product restrictions in Nutrebem 
 
 - **Version:** 1.0.0
 - **Author:** Tarsius Oliveira
-- **Repository:** https://github.com/tarsiusoliveira/Robo-Nutrebem
+- **Repository:** https://github.com/tarsiusoliveira/Robos-Nutrebem
 - **Python Version:** 3.7+
 - **Status:** Active
 
@@ -52,14 +53,17 @@ This project uses browser automation to manage restricted data. **Never commit s
 .
 ├── .github/
 │   └── copilot-instructions.md
-├── .env.example           (Template for environment variables)
-├── .gitignore            (Prevents accidental commits of sensitive data)
-├── venv/                 (Virtual environment - created by setup)
-├── requirements.txt      (Project dependencies)
-├── robo_nutrebem_prod.py  (Production automation script)
-├── robo_nutrebem_staging.py (Staging automation script)
-├── README.md             (This file)
-└── dados_exec_prod.csv   (Data file - NOT committed to git)
+├── .env.example                              (Template for environment variables)
+├── .gitignore                                (Prevents accidental commits of sensitive data)
+├── venv/                                     (Virtual environment - created by setup)
+├── requirements.txt                          (Project dependencies)
+├── robo_nutrebem_restrictions_prod.py        (Product restrictions for Production)
+├── robo_nutrebem_restrictions_staging.py     (Product restrictions for Staging)
+├── robo_promocredits.py                      (Promotional credits launcher)
+├── SECURITY.md                               (Security guidelines)
+├── README.md                                 (This file)
+├── dados_exec_prod.csv                       (Production data - NOT committed)
+└── dados_credito_promo.csv                   (Promo credits data - NOT committed)
 ```
 
 ## Setup Instructions
@@ -112,8 +116,9 @@ STAGING_PASSWORD=your_staging_password
 ### 5. Add Your Data Files
 
 Place your CSV data files in the project root:
-- `dados_exec_prod.csv` (for production)
-- `dados_teste_staging.csv` (for staging)
+- `dados_exec_prod.csv` - Product IDs for production restrictions (Robo Restrições Produção)
+- `dados_teste_staging.csv` - Product IDs for staging restrictions (Robo Restrições Staging)
+- `dados_credito_promo.csv` - Student IDs and credit amounts (Robo Créditos Promocionais)
 
 Or specify custom paths in your `.env` file:
 ```
@@ -121,17 +126,98 @@ PROD_CSV_FILE=path/to/your/prod_data.csv
 STAGING_CSV_FILE=path/to/your/staging_data.csv
 ```
 
+**CSV File Formats:**
+
+**dados_exec_prod.csv & dados_teste_staging.csv:**
+```
+product_id
+12345
+67890
+...
+```
+
+**dados_credito_promo.csv:**
+```
+student_id,prize_amount
+S12345,10,00
+S67890,15,00
+...
+```
+
+⚠️ **Note:** All CSV files should be in `.gitignore` and never committed to version control.
+
+## 🤖 Available Robots
+
+### 1. **Robo Restrições Produção** (`robo_nutrebem_restrictions_prod.py`)
+Updates product restrictions in the **production environment**.
+
+**What it does:**
+- Reads product IDs from `dados_exec_prod.csv`
+- Authenticates using production credentials (`PROD_EMAIL` / `PROD_PASSWORD`)
+- Batch updates product restrictions in https://app.nutrebem.com.br
+- Provides detailed logging of all operations
+
+**Configuration:**
+```
+PROD_EMAIL=your_prod_email@example.com
+PROD_PASSWORD=your_prod_password
+PROD_CSV_FILE=dados_exec_prod.csv
+```
+
+---
+
+### 2. **Robo Restrições Staging** (`robo_nutrebem_restrictions_staging.py`)
+Updates product restrictions in the **staging environment** for testing.
+
+**What it does:**
+- Reads product IDs from staging data file
+- Authenticates using staging credentials (`STAGING_EMAIL` / `STAGING_PASSWORD`)
+- Batch updates product restrictions in https://nutrebem.dev.nutrebem.com.br
+- Provides detailed logging of all operations
+
+**Configuration:**
+```
+STAGING_EMAIL=your_staging_email@example.com
+STAGING_PASSWORD=your_staging_password
+STAGING_CSV_FILE=dados_teste_staging.csv
+```
+
+---
+
+### 3. **Robo Créditos Promocionais** (`robo_promocredits.py`)
+Launches promotional credits to students (supports both production and staging).
+
+**What it does:**
+- Reads student IDs and promotional credit amounts from `dados_credito_promo.csv`
+- Authenticates based on configured environment (STAGING or PRODUCAO)
+- Batch creates promotional credit entries for each student
+- Associates credits with a promotion name (e.g., "Sorteio Nutrebem 15 Anos")
+
+**Configuration:**
+- Edit the script to set `AMBIENTE = "PRODUCAO"` or `AMBIENTE = "STAGING"`
+- Update `ARQUIVO_CSV` and `NOME_PROMO` as needed
+- Uses same credentials as restriction robots
+
+---
+
 ## Usage
 
-### Run Production Script
+### Run Production Restrictions Robot
 ```bash
-python robo_nutrebem_prod.py
+python robo_nutrebem_restrictions_prod.py
 ```
 
-### Run Staging Script
+### Run Staging Restrictions Robot
 ```bash
-python robo_nutrebem_staging.py
+python robo_nutrebem_restrictions_staging.py
 ```
+
+### Run Promotional Credits Robot
+```bash
+python robo_promocredits.py
+```
+
+**Tip:** Before running, modify the `AMBIENTE` variable in the script to select Production or Staging.
 
 ## Dependencies
 
