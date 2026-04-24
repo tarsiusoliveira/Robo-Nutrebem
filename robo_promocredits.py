@@ -1,13 +1,25 @@
 from playwright.sync_api import sync_playwright
 import pandas as pd
 import time
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ==========================================
 # CONFIGURAÇÕES DO ROBÔ
 # ==========================================
 AMBIENTE = "PRODUCAO"  # Mude para "PRODUCAO" quando for rodar o real
-ARQUIVO_CSV = "dados_credito_promo.csv"
-NOME_PROMO = "Sorteio Nutrebem 15 Anos"
+ARQUIVO_CSV = os.getenv('PROMO_CSV_FILE', 'dados_credito_promo.csv')
+NOME_PROMO = os.getenv('PROMO_NAME', 'Sorteio Nutrebem 15 Anos')
+
+# Get credentials from environment variables
+EMAIL = os.getenv('PROMO_EMAIL')
+PASSWORD = os.getenv('PROMO_PASSWORD')
+
+if not EMAIL or not PASSWORD:
+    raise ValueError("PROMO_EMAIL and PROMO_PASSWORD environment variables are required. See .env.example for setup.")
 
 # Dicionário de URLs para facilitar a troca de ambiente
 URLS = {
@@ -48,9 +60,9 @@ def lancar_creditos_promocionais():
         print(f"Iniciando processo de Login ({AMBIENTE})...")
         page.goto(URLS[AMBIENTE]["login"]) 
         
-        # PREENCHA COM SEU EMAIL E SENHA:
-        page.fill("input[type='text'], input[type='email']", "tarsius@easyfood.com.br")
-        page.fill("input[type='password']", "92629262ts")
+        # Use credentials from environment variables
+        page.fill("input[type='text'], input[type='email']", EMAIL)
+        page.fill("input[type='password']", PASSWORD)
         page.click("input[type='submit'], button:has-text('Entrar')") 
         
         page.wait_for_load_state('networkidle')
