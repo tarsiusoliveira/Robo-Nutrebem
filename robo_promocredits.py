@@ -10,7 +10,7 @@ load_dotenv()
 # ==========================================
 # CONFIGURAÇÕES DO ROBÔ
 # ==========================================
-AMBIENTE = "PRODUCAO"  # Mude para "PRODUCAO" quando for rodar o real
+AMBIENTE = "STAGING"  # Mude para "PRODUCAO" quando for rodar o real
 ARQUIVO_CSV = os.getenv('PROMO_CSV_FILE', 'dados_credito_promo.csv')
 NOME_PROMO = os.getenv('PROMO_NAME', 'Sorteio Nutrebem 15 Anos')
 
