@@ -1,5 +1,5 @@
 # Virtual Environment
-venv/
+venv/*
 env/
 ENV/
 .venv
@@ -49,4 +49,6 @@ htmlcov/
 # Data files (sensitive/large)
 *.csv
 dados_*
+*.pdf
 !.gitkeep
+contratos_leitura/
