@@ -60,6 +60,7 @@ This project uses browser automation to manage restricted data. **Never commit s
 ├── robo_nutrebem_restrictions_prod.py        (Product restrictions for Production)
 ├── robo_nutrebem_restrictions_staging.py     (Product restrictions for Staging)
 ├── robo_promocredits.py                      (Promotional credits launcher)
+├── leitor_contrato.py                        (Contract PDF data extractor)
 ├── SECURITY.md                               (Security guidelines)
 ├── README.md                                 (This file)
 ├── dados_exec_prod.csv                       (Production data - NOT committed)
@@ -200,6 +201,26 @@ Launches promotional credits to students (supports both production and staging).
 
 ---
 
+### 4. **Leitor Contrato** (`leitor_contrato.py`)
+Extracts contract data from PDF files for bulk processing.
+
+**What it does:**
+- Reads PDF contract files from the specified directory
+- Extracts structured data including:
+  - School/Client information (name, address, CEP, etc.)
+  - Bank account details (bank code, agency, account number)
+  - Contact information (name, email, phone)
+  - PIX keys and transaction rates
+- Generates CSV output with extracted contract data
+- Automatically identifies bank codes from text descriptions
+
+**Configuration:**
+- Specify the PDF directory path in the script
+- Optional: Customize the output CSV file name
+- Uses `pdfplumber` for PDF parsing
+
+---
+
 ## Usage
 
 ### Run Production Restrictions Robot
@@ -215,6 +236,11 @@ python robo_nutrebem_restrictions_staging.py
 ### Run Promotional Credits Robot
 ```bash
 python robo_promocredits.py
+```
+
+### Run Contract Reader Robot
+```bash
+python leitor_contrato.py
 ```
 
 **Tip:** Before running, modify the `AMBIENTE` variable in the script to select Production or Staging.
